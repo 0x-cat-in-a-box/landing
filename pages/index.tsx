@@ -11,6 +11,7 @@ const tokenName: string = process.env.NEXT_PUBLIC_TOKEN_NAME ?? "Token Name";
 const heading: string = process.env.NEXT_PUBLIC_HEADING ?? "Some heading";
 const description: string =
   process.env.NEXT_PUBLIC_DESCRIPTION ?? "Some description";
+const explorer = "https://basescan.org/";
 
 export default function Home() {
   // Routing
@@ -29,13 +30,15 @@ export default function Home() {
     claimAirdrop: Function;
   } = token.useContainer();
   const [buttonLoading, setButtonLoading] = useState<boolean>(false);
+  const [successMsg, setSuccessMsg] = useState("");
 
     /**
    * Claims airdrop with local button loading
    */
      const claimWithLoading = async () => {
       setButtonLoading(true); // Toggle
-      await claimAirdrop(); // Claim
+      const res = await claimAirdrop(); // Claim
+      if(res && typeof res === "string") setSuccessMsg(res)
       setButtonLoading(false); // Toggle
     };
 
@@ -72,7 +75,13 @@ export default function Home() {
             <button onClick={() => push("/#")}>Buy</button>
           </div>
         )}
-
+        {successMsg ? (
+          <div style={{ textAlign: "center", margin: "0 auto" }}>
+          <a href={`${explorer}${successMsg.startsWith("0x") ? `tx/${successMsg}` : `address/${address}#transactions`}`} style={{ textAlign: "center", margin: "0 auto" }}>
+            {successMsg.startsWith("0x") ? "View Transaction" : "View Address History"}
+          </a>
+          </div>
+        ) : null}
       </div>
 
       <div style={{ position: "fixed", bottom: "-1rem", left: "50%", transform: "translate(-50%, 0%)" }}>

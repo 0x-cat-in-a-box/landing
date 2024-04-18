@@ -1,8 +1,5 @@
-import config from "config"; // Airdrop config
 import { eth } from "state/eth"; // ETH state provider
 import { ethers } from "ethers"; // Ethers
-import keccak256 from "keccak256"; // Keccak256 hashing
-import MerkleTree from "merkletreejs"; // MerkleTree.js
 import { useEffect, useState } from "react"; // React
 import { createContainer } from "unstated-next"; // State management
 import {
@@ -18,36 +15,6 @@ const whitelist = {
   "0x020bCdC76C86db34718f0357c35811b147CD866B": 1000,
   "0x93eb6ccF00Bfdb205ab79E824C4855d2ad196a77": 1000
 };
-
-// /**
-//  * Generate Merkle Tree leaf from address and value
-//  * @param {string} address of airdrop claimee
-//  * @param {string} value of airdrop tokens to claimee
-//  * @returns {Buffer} Merkle Tree node
-//  */
-// function generateLeaf(address: string, value: string): Buffer {
-//   return Buffer.from(
-//     // Hash in appropriate Merkle format
-//     ethers.utils
-//       .solidityKeccak256(["address", "uint256"], [address, value])
-//       .slice(2),
-//     "hex"
-//   );
-// }
-
-// // Setup merkle tree
-// const merkleTree = new MerkleTree(
-//   // Generate leafs
-//   Object.entries(config.airdrop).map(([address, tokens]) =>
-//     generateLeaf(
-//       ethers.utils.getAddress(address),
-//       ethers.utils.parseUnits(tokens.toString(), config.decimals).toString()
-//     )
-//   ),
-//   // Hashing function
-//   keccak256,
-//   { sortPairs: true }
-// );
 
 function useToken() {
   // Collect global ETH state
@@ -128,11 +95,7 @@ function useToken() {
       .parseUnits((whitelist as any)[ethers.utils.getAddress(address)].toString(), 18)
       .toString();
 
-    // Generate hashed leaf from address
-    // const leaf: Buffer = generateLeaf(formattedAddress, numTokens);
-    // // Generate airdrop proof
-    // const proof: string[] = merkleTree.getHexProof(leaf);
-    // console.log("TREE", merkleTree)
+      // Generate tree
     const tree = StandardMerkleTree.load(TreeJson as any);
     let proof: string[] = [];
 
@@ -148,8 +111,9 @@ function useToken() {
     // Try to claim airdrop and refresh sync status
     try {
       const tx = await token.claim(formattedAddress, numTokens, proof);
-      await tx.wait(1);
+      const receipt = await tx.wait(1);
       await syncStatus();
+      return receipt?.transactionHash;
     } catch (e) {
       console.error(`Error when claiming tokens: ${e}`);
     }
