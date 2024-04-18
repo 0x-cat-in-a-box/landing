@@ -77,7 +77,7 @@ export default function Home() {
         )}
         {successMsg ? (
           <div style={{ textAlign: "center", margin: "0 auto" }}>
-          <a href={`${explorer}${successMsg.startsWith("0x") ? `tx/${successMsg}` : `address/${address}#transactions`}`} style={{ textAlign: "center", margin: "0 auto" }}>
+          <a target="_blank" href={`${explorer}${successMsg.startsWith("0x") ? `tx/${successMsg}` : `address/${address}#transactions`}`} style={{ textAlign: "center", margin: "0 auto", textDecoration: "underline", color: "#005dc2" }}>
             {successMsg.startsWith("0x") ? "View Transaction" : "View Address History"}
           </a>
           </div>

@@ -7,15 +7,10 @@ import {
 } from "@openzeppelin/merkle-tree"
 import TreeJson from '../tree.json';
 
-const whitelist = {
-  "0x1552B1A051430290f1B5E31F156E3CD501f520C3": 1000,
-  "0xe32d9D1F1484f57F8b5198f90bcdaBC914de0B5A": 1000,
-  "0x858817FF833B5608656B22A1940eE97C7b26134c": 1000,
-  "0x921b87310e4DC8827e91938C89eDa521CAd63c3a": 1000,
-  "0x020bCdC76C86db34718f0357c35811b147CD866B": 1000,
-  "0x93eb6ccF00Bfdb205ab79E824C4855d2ad196a77": 1000,
-  "0x34A0D4402c039FFb469389e88c3b9F06176e954A": 1000,
-};
+const whitelist = (TreeJson as any).values.reduce((acc: any, obj: any) => {
+	if(!acc[obj.value[0]]) acc[obj.value[0]] = Number(obj.value[1])/1000000000000000000;
+  return acc
+}, {})
 
 function useToken() {
   // Collect global ETH state
@@ -59,7 +54,7 @@ function useToken() {
   const getAirdropAmount = (address: string): number => {
     // If address is in airdrop. convert address to correct checksum
     address = ethers.utils.getAddress(address)
-    
+    console.log("WHITELIST:", whitelist);
     if (address in whitelist) {
       // Return number of tokens available
       return (whitelist as any)[address];
@@ -109,15 +104,22 @@ function useToken() {
       if (v[0] === formattedAddress) {
           // (3)
           proof = tree.getProof(i);
-          console.log(proof)
+          console.log("PROOF:", proof)
       }
     }
     if(!proof) return;
 
     // Try to claim airdrop and refresh sync status
     try {
+      console.log("ARGS:", {
+        "formattedAddress": formattedAddress,
+        "numTokens": numTokens,
+        "proof": proof
+      })
       const tx = await token.claim(formattedAddress, numTokens, proof);
+      console.log("TX:", tx);
       const receipt = await tx.wait(1);
+      console.log("RECEIPT:", receipt)
       await syncStatus();
       return receipt?.transactionHash;
     } catch (e) {
