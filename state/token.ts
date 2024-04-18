@@ -75,10 +75,15 @@ function useToken() {
    * @returns {Promise<boolean>} true if already claimed, false if available
    */
   const getClaimedStatus = async (address: string): Promise<boolean> => {
+    try {
     // Collect token contract
     const token: ethers.Contract = getContract();
     // Return claimed status
     return await token.hasClaimed(address);
+    } catch (e) {
+      console.error("#getClaimedStatus:", e);
+      return false;
+    }
   };
 
   const claimAirdrop = async (): Promise<void> => {
