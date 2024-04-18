@@ -169,10 +169,10 @@ function useToken() {
       setNumTokens(tokens);
 
       // Collect claimed status for address, if part of airdrop (tokens > 0)
-      // if (tokens > 0) {
-      //   const claimed = await getClaimedStatus(address);
-      //   setAlreadyClaimed(claimed);
-      // }
+      if (tokens > 0) {
+        const claimed = await getClaimedStatus(address);
+        setAlreadyClaimed(claimed);
+      }
     }
 
     // Toggle loading

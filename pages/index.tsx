@@ -56,11 +56,10 @@ export default function Home() {
           <div className={styles.card}>
             <h1>Looking for your cats...</h1>
           </div>
-        ) : numTokens == 0 ? (
+        ) : numTokens === 0 ? (
           // Not part of airdrop
           <div className={styles.card}>
-            <h1>You do not have any cats available :(</h1>
-            <p>Unfortunately, your address does not qualify for the airdrop.</p>
+            <h1>You cannot claim any cats :(</h1>
           </div>
         ) : alreadyClaimed ? (
           // Already claimed airdrop
